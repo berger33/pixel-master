@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# artefatos de runtime (banco local, uploads, exportações)
+backend/var/
+backend/*.db
+backend/pixelmaster.db
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# editores / SO
+.vscode/
+.idea/
+.DS_Store
+*.log
+.env
+.env.*

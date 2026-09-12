@@ -1,0 +1,12 @@
+line-length = 120
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+  "E501",    # linhas longas são aceitáveis em código de desenho/coordenadas
+  "B008",    # Depends() em assinatura de rota é o padrão FastAPI
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["B011", "S101"]
