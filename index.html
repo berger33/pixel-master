@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Master — Criador de Personagens &amp; Criaturas (Vandoria)</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-logo">◆</span>
+      <div class="brand-text">
+        <h1>Pixel Master</h1>
+        <p>Criador de Personagens &amp; Criaturas — <strong>Vandoria</strong></p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btn-new" class="btn" title="Criar um novo projeto">＋ Novo</button>
+      <button id="btn-load" class="btn" title="Abrir projeto salvo no navegador">📂 Abrir</button>
+      <button id="btn-save" class="btn" title="Salvar projeto no navegador">💾 Salvar</button>
+      <button id="btn-import" class="btn" title="Importar projeto a partir de um arquivo JSON">📥 Importar</button>
+      <span class="sep"></span>
+      <button id="btn-export-png" class="btn btn-primary" title="Baixar sprites em PNG">🖼 PNG</button>
+      <button id="btn-export-sheet" class="btn btn-primary" title="Baixar sprite sheet (todas as animações)">🧩 Sprite Sheet</button>
+      <button id="btn-export-json" class="btn btn-accent" title="Baixar dados do personagem em JSON">{} JSON</button>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ===================== PAINEL DE FERRAMENTAS ===================== -->
+    <aside class="panel tools-panel">
+      <h2>Ferramentas</h2>
+      <div class="tool-grid" id="tool-grid">
+        <button class="tool active" data-tool="pencil" title="Lápis (B)">✏️<span>Lápis</span></button>
+        <button class="tool" data-tool="eraser" title="Borracha (E)">🧽<span>Borracha</span></button>
+        <button class="tool" data-tool="fill" title="Balde / preencher (F)">🪣<span>Balde</span></button>
+        <button class="tool" data-tool="eyedropper" title="Conta-gotas (I)">💉<span>Conta-gotas</span></button>
+        <button class="tool" data-tool="move" title="Mover conteúdo (M)">↔️<span>Mover</span></button>
+      </div>
+
+      <div class="row">
+        <button id="btn-undo" class="btn" title="Desfazer (Ctrl+Z)">↶ Desfazer</button>
+        <button id="btn-redo" class="btn" title="Refazer (Ctrl+Y)">↷ Refazer</button>
+      </div>
+
+      <div class="row">
+        <button id="btn-clear-frame" class="btn btn-danger" title="Limpar o frame atual">Limpar frame</button>
+        <button id="btn-flip-h" class="btn" title="Espelhar horizontalmente">⇋ Espelhar</button>
+        <button id="btn-flip-v" class="btn" title="Espelhar verticalmente">⇵ Virar</button>
+      </div>
+
+      <h2>Configuração</h2>
+      <label class="field">
+        <span>Grade (px)</span>
+        <select id="grid-size">
+          <option value="16">16 × 16</option>
+          <option value="32" selected>32 × 32</option>
+          <option value="48">48 × 48</option>
+          <option value="64">64 × 64</option>
+        </select>
+      </label>
+
+      <div class="row">
+        <button id="btn-zoom-out" class="btn" title="Diminuir zoom">−</button>
+        <span id="zoom-label" class="zoom-label">100%</span>
+        <button id="btn-zoom-in" class="btn" title="Aumentar zoom">＋</button>
+      </div>
+
+      <label class="toggle">
+        <input type="checkbox" id="mirror-x" />
+        <span>Espelhamento em X (simetria)</span>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="onion-skin" />
+        <span>Onion skin (frame anterior)</span>
+      </label>
+    </aside>
+
+    <!-- ===================== ÁREA DO CANVAS ===================== -->
+    <section class="canvas-area">
+      <div class="anim-bar">
+        <label class="field">
+          <span>Animação</span>
+          <select id="anim-select"></select>
+        </label>
+        <label class="field small">
+          <span>FPS</span>
+          <input type="number" id="anim-fps" min="1" max="30" value="4" />
+        </label>
+        <button id="btn-add-anim" class="btn" title="Nova animação">＋ Animação</button>
+        <button id="btn-rename-anim" class="btn" title="Renomear animação">✎</button>
+        <button id="btn-del-anim" class="btn btn-danger" title="Remover animação">🗑</button>
+      </div>
+
+      <div class="canvas-wrap" id="canvas-wrap">
+        <canvas id="editor-canvas"></canvas>
+      </div>
+
+      <div class="frames-bar">
+        <div class="frames-scroll" id="frames-strip"></div>
+        <div class="frames-actions">
+          <button id="btn-add-frame" class="btn" title="Adicionar frame">＋ Frame</button>
+          <button id="btn-dup-frame" class="btn" title="Duplicar frame">⧉ Duplicar</button>
+          <button id="btn-del-frame" class="btn btn-danger" title="Remover frame">🗑</button>
+        </div>
+      </div>
+      <p class="hint">Desenhe com o botão esquerdo. Use as teclas <kbd>B</kbd> <kbd>E</kbd> <kbd>F</kbd> <kbd>I</kbd> <kbd>M</kbd> para trocar de ferramenta.</p>
+    </section>
+
+    <!-- ===================== PAINEL DIREITO ===================== -->
+    <aside class="panel right-panel">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="palette">Paleta</button>
+        <button class="tab" data-tab="stats">Atributos</button>
+        <button class="tab" data-tab="templates">Modelos</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-palette">
+        <label class="field">
+          <span>Paleta pronta</span>
+          <select id="preset-palette"></select>
+        </label>
+        <div class="swatches" id="swatches"></div>
+        <div class="row">
+          <input type="color" id="custom-color" value="#ff0000" title="Cor personalizada" />
+          <button id="btn-add-color" class="btn" title="Adicionar cor à paleta">＋ Cor</button>
+          <button id="btn-del-color" class="btn btn-danger" title="Remover cor selecionada">🗑</button>
+        </div>
+        <div class="active-color" id="active-color">
+          <span class="active-swatch" id="active-swatch"></span>
+          <span id="active-color-hex">#000000</span>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-stats">
+        <label class="field"><span>Nome</span><input type="text" id="stat-name" /></label>
+        <label class="field">
+          <span>Tipo</span>
+          <select id="stat-kind">
+            <option value="character">Personagem</option>
+            <option value="creature">Criatura</option>
+          </select>
+        </label>
+        <label class="field"><span>Categoria</span><input type="text" id="stat-category" placeholder="humanoid, fera, espírito…" /></label>
+        <label class="field">
+          <span>Raridade</span>
+          <select id="stat-rarity">
+            <option value="common">Comum</option>
+            <option value="uncommon">Incomum</option>
+            <option value="rare">Raro</option>
+            <option value="epic">Épico</option>
+            <option value="legendary">Lendário</option>
+          </select>
+        </label>
+        <div class="stat-grid">
+          <label class="field"><span>HP</span><input type="number" id="stat-hp" min="0" /></label>
+          <label class="field"><span>Ataque</span><input type="number" id="stat-atk" min="0" /></label>
+          <label class="field"><span>Defesa</span><input type="number" id="stat-def" min="0" /></label>
+          <label class="field"><span>Veloc.</span><input type="number" id="stat-spd" min="0" /></label>
+          <label class="field"><span>Magia</span><input type="number" id="stat-mag" min="0" /></label>
+        </div>
+        <label class="field"><span>Descrição</span><textarea id="stat-desc" rows="3" placeholder="História, habilidades…"></textarea></label>
+      </div>
+
+      <div class="tab-panel" id="tab-templates">
+        <p class="hint">Escolha um modelo inicial para acelerar a criação.</p>
+        <div class="template-grid" id="template-grid"></div>
+      </div>
+
+      <div class="preview">
+        <h2>Pré-visualização</h2>
+        <div class="preview-canvas-wrap">
+          <canvas id="preview-canvas"></canvas>
+        </div>
+        <div class="row">
+          <button id="btn-play" class="btn">▶ Play</button>
+          <button id="btn-stop" class="btn">■ Stop</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <input type="file" id="file-input" accept="application/json,.json" hidden />
+
+  <script src="js/state.js"></script>
+  <script src="js/palette.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/frames.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/preview.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
