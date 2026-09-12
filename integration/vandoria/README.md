@@ -39,7 +39,7 @@ Carregando o bestiário inteiro no Phaser:
 const bestiary = JSON.parse(await (await fetch('assets/bestiary/bestiary.json')).text());
 for (const entry of bestiary.characters) {
   // dir já termina com '/'; paths em entry.files são relativos a dir
-  loadPixelMasterCharacter(scene, `assets/bestiary/${entry.dir}`, entry.slug);
+  await loadPixelMasterCharacter(scene, entry.slug, `assets/bestiary/${entry.dir}`);
 }
 ```
 
