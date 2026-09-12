@@ -76,3 +76,5 @@ node tools/generate-examples.js
 | `456a40b` | feat: animações consistentes (idle/walk/attack) + 3 novos modelos (Golem, Zumbi, Aranha) |
 | `e1ab18f` | feat: gerador de sprites/JSON de exemplo + slugify com acentos |
 | `cd8c6c7` | assets: sprites PNG e JSON de exemplo para os 9 modelos |
+| `2f38c9d` | docs: atualiza painel de commits e documenta exemplos |
+| `a9dcaf8` | docs: análise comparativa do estilo Tibia vs Pixel Master |
