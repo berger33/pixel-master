@@ -61,6 +61,11 @@ Tibia: cambaleia → cai → assenta → dessatura), todas por pivôs e tags.
 `atlas_sparrow.xml` · `atlas_aseprite.json` · `preview.gif` · `frames/*.png` ·
 `card.json` (ficha funcional) · `README.txt` — tudo num `.zip`.
 
+**Exportação em lote:** `POST /api/characters/export-batch` empacota o bestiário
+inteiro num único `.zip` — índice `bestiary.json` (stats/habilidades/caminhos),
+`contact_sheet.png` e uma pasta por personagem. No editor: botão **📚 Exportar
+bestiário completo** na Biblioteca.
+
 ### 5. Editor web
 Pré-visualização animada em canvas (pixel-perfect), controles de espécie /
 seed / proporções / equipamento / paleta, importação por arrastar-e-soltar,

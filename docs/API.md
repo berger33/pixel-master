@@ -79,12 +79,28 @@ Resposta: `{ asset, preview: {pose, strip, sheet, gif, manifest}, frame_count, c
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/api/characters/{id}/export` | Monta o pacote; body `ExportOptions` (opcional) |
+| POST | `/api/characters/export-batch` | **Bestiário completo** num único `.zip`; body `{ "ids": [...]?, "options": {...}? }` (`ids` omitido/null = todos os salvos) |
 | GET | `/api/exports/{filename}` | Baixa o `.zip` gerado |
 
 `ExportOptions`: `formats` (`phaser_hash`, `phaser_array`, `sparrow_xml`,
 `uniform_grid`, `aseprite_sheet`), `include_sparrow_xml`, `include_gif_preview`,
 `include_individual_frames`, `include_manifest`, `include_stats`,
 `include_vandoria_card`, `scale` (1–8), `transparent_background`.
+
+### Exportação em lote (`export-batch`)
+
+Resposta `BatchExportResult`: `filename`, `size_bytes`, `download_url`
+(`/api/exports/...`), `character_count` e `files`. Layout do zip:
+
+```
+bestiary.json          # índice: id, slug, name, species, rarity, origin, seed,
+                       #         stats, abilities, power_rating, sprite size e
+                       #         caminhos (dir/) de cada personagem
+contact_sheet.png      # poses frontais em grade de 8 colunas (overview)
+<slug>__<id8>/         # pasta por personagem — mesmo conteúdo do export individual
+```
+
+Erros: `404` se algum id não existe ou se a seleção é vazia.
 
 ## Códigos de erro
 

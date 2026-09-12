@@ -17,6 +17,32 @@ Este diretório contém o helper oficial de integração para **Phaser 3**
 | `card.json` | **Ficha funcional**: stats, habilidades, recompensas — para o backend de combate |
 | `README.txt` | Instruções rápidas geradas por personagem |
 
+## Bestiário completo (export em lote)
+
+`POST /api/characters/export-batch` (body `{}` = todos os personagens salvos;
+`{"ids": [...]}` = subconjunto) gera um zip único:
+
+```
+bestiary.json          # índice do bestiário
+contact_sheet.png      # poses frontais em grade de 8 colunas (overview visual)
+<slug>__<id8>/         # uma pasta por personagem (idêntica ao pacote individual)
+```
+
+Cada entrada de `bestiary.json.characters` traz: `id`, `slug`, `name`, `kind`,
+`species`, `rarity`, `origin`, `seed`, `stats` (health/mana/attack/defense/speed),
+`abilities`, `power_rating`, `sprite` (`width`/`height` do frame) e `files`
+(caminhos relativos de spritesheet/manifesto/cartão/pose dentro de `dir`).
+
+Carregando o bestiário inteiro no Phaser:
+
+```js
+const bestiary = JSON.parse(await (await fetch('assets/bestiary/bestiary.json')).text());
+for (const entry of bestiary.characters) {
+  // dir já termina com '/'; paths em entry.files são relativos a dir
+  loadPixelMasterCharacter(scene, `assets/bestiary/${entry.dir}`, entry.slug);
+}
+```
+
 ## Convenção de grade
 
 * Quadro fixo de `frameWidth × frameHeight` (padrão 64×64).

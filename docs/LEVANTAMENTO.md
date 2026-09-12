@@ -80,11 +80,15 @@ ser construído do zero.
 - [x] pacote `.zip`: spritesheet, manifestos, atlas alternativos, preview.gif,
       frames individuais, `card.json` (ficha funcional), README de integração;
 - [x] helper Phaser 3 (`pixelmaster-loader.js`) com `loadPixelMasterCharacter`,
-      `spawnCharacter` e `loadCharacterCard`.
+      `spawnCharacter` e `loadCharacterCard`;
+- [x] **exportação em lote do bestiário** (`POST /api/characters/export-batch`):
+      zip único com índice `bestiary.json` (stats + habilidades + caminhos),
+      `contact_sheet.png` (grade de poses frontais) e uma pasta por personagem.
 
 ### 3.6 API + persistência (`backend/app/api|services|db`)
 - [x] FastAPI com geração, importação multipart, CRUD, previews sob demanda
-      (pose/strip/sheet/gif/manifest/card) e download do zip;
+      (pose/strip/sheet/gif/manifest/card), download do zip e export do
+      bestiário completo em lote;
 - [x] persistência SQLAlchemy Core (SQLite; Postgres via `DATABASE_URL`);
 - [x] ficha de stats/habilidades derivada deterministicamente de espécie +
       raridade + nível + seed.
@@ -95,7 +99,7 @@ ser construído do zero.
 - [x] painéis procedural / importação de IA / ficha / exportação / biblioteca.
 
 ### 3.8 Engenharia
-- [x] **87 testes** passando (motor, geradores, animador, pipeline de IA, API);
+- [x] **90 testes** passando (motor, geradores, animador, pipeline de IA, API);
 - [x] **ruff limpo** + **tsc limpo**;
 - [x] CI GitHub Actions (backend: pytest+ruff; frontend: typecheck+build);
 - [x] Dockerfile + docker-compose + Makefile;
@@ -107,7 +111,7 @@ ser construído do zero.
 
 | Métrica | Valor |
 |---|---|
-| Testes automatizados | 87 (todos verdes) |
+| Testes automatizados | 90 (todos verdes) |
 | Espécies no catálogo | 28 |
 | Arquétipos anatômicos | 7 |
 | Armas / secundárias / coberturas | 14 / 5 / 9 |
@@ -136,7 +140,7 @@ depois, registrados por transparência:
 ## 6. Como verificar a entrega
 
 ```bash
-make test        # 87 testes
+make test        # 90 testes
 make lint        # ruff + tsc
 make run-api     # Swagger em http://localhost:8000/docs
 make run-web     # editor em http://localhost:5173
