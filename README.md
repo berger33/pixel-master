@@ -48,6 +48,35 @@ Ao carregar um modelo, o Pixel Master gera automaticamente as animações **a pa
 | `walk` | 4 | alternância dos pés (modelos bípedes) ou ondulação/pulo (slime, fantasma) |
 | `attack` | 3 | agacha → golpeia (sobe 1px) → recupera |
 
+## 🏛️ Motor de personagens estilo Tibia (novo)
+
+Além do editor de pixel art, o projeto agora inclui um **motor de criação no estilo Tibia** (`js/tibia.js`), baseado na análise empírica dos outfits reais (ver `docs/analise-outfits-reais.md`):
+
+- **Projeção oblíqua top-down (~135°)** — a "inclinação" característica do Tibia.
+- **4 direções** (norte/east/south/west) × **4 frames de caminhada** (parado → passo → parado → passo) = 16 sprites por personagem.
+- **Contorno escuro** na silhueta (auto-calculado).
+- **Sistema de cor por partes**: cabeça / corpo / pernas / pés, com **máscara de tint** — troca de cor sem redesenhar.
+- Canvas nativo **32×32** + export **64×64** (upscale 2×), como os outfits modernos do Tibia.
+
+### Gerar um personagem
+
+```bash
+node tools/generate-tibia-character.js                         # guerreiro (padrão)
+node tools/generate-tibia-character.js --name Mage \
+  --body "#2a6ad0" --legs "#c8a02a" --hair "#3a2a50"            # recolorir
+node tools/generate-tibia-character.js --ascii                 # visualizar 1 frame em texto
+```
+
+A saída vai para `examples/tibia/<nome>/`:
+
+- `32/` e `64/` — sprites nomeados `{direção}_{montaria}_{addon}_{frame}.png` (padrão Tibia).
+- `mask/` — máscaras de cor (🔴 cabeça · 🟡 corpo · 🟢 pernas · 🔵 pés).
+- `overview.png` — grade 4 direções × 4 frames.
+- `recolor-demo.png` — prova do sistema de tint (recolorido sem redesenhar).
+- `index.html` — galeria para visualizar tudo no navegador.
+
+Exemplos já gerados: `examples/tibia/warrior/` (vermelho) e `examples/tibia/mage/` (azul/dourado).
+
 ## 📁 Exemplos prontos (`examples/`)
 
 Sprites e JSON já gerados para os 9 modelos, prontos para usar no Vandoria:
@@ -79,3 +108,7 @@ node tools/generate-examples.js
 | `2f38c9d` | docs: atualiza painel de commits e documenta exemplos |
 | `a9dcaf8` | docs: análise comparativa do estilo Tibia vs Pixel Master |
 | `bdf1225` | docs: análise empírica dos outfits reais do Tibia (dimensões, direções, ciclo de caminhada, tint por partes) |
+| `8585d55` | docs: registra análise empírica no painel de commits |
+| `63cd7dd` | feat: motor de personagens estilo Tibia (4 direções × 4 frames, contorno, cor por partes) |
+| `770fe31` | feat: gerador CLI de personagem Tibia (PNG 32/64, máscara de cor, recolor) |
+| `992adad` | assets: personagens de exemplo estilo Tibia (Warrior e Mage, 4 direções × 4 frames) |
