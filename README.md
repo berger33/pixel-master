@@ -48,3 +48,4 @@ python3 -m http.server 8000
 | `67b2442` | feat: animações/frames, atributos, templates prontos e preview |
 | `93f4182` | feat: exportação (PNG/sheet/JSON), persistência local e orquestração |
 | `bea6f3c` | docs: painel de commits no README |
+| `dd18c59` | docs: corrige hash no painel de commits |
