@@ -112,4 +112,6 @@ node tools/generate-examples.js
 | `63cd7dd` | feat: motor de personagens estilo Tibia (4 direções × 4 frames, contorno, cor por partes) |
 | `770fe31` | feat: gerador CLI de personagem Tibia (PNG 32/64, máscara de cor, recolor) |
 | `992adad` | assets: personagens de exemplo estilo Tibia (Warrior e Mage, 4 direções × 4 frames) |
+| `b58cf54` | docs: documenta motor Tibia e atualiza painel de commits |
+| `d6a5d04` | feat: pipeline de arte estilo Tibia (iluminação direcional, rampas 4 tons + dithering, selout) — 30 cores |
 | `7121be8` | feat: pipeline de arte (iluminação direcional, rampas de 4 tons + dithering, selout) — qualidade Tibia |
