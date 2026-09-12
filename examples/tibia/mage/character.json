@@ -12,15 +12,13 @@
   ],
   "framesPerDirection": 4,
   "palette": {
-    "outline": "#1a1616",
-    "head": "#f2c89a",
+    "outline": "#1e1814",
+    "outlineLight": "#4e3e32",
+    "skin": "#eec496",
     "hair": "#3a2a50",
     "body": "#2a6ad0",
-    "bodyDark": "#1b4587",
     "legs": "#c8a02a",
-    "legsDark": "#82681b",
-    "feet": "#4a3220",
-    "feetDark": "#302115"
+    "feet": "#4a3220"
   },
   "sprites": [
     {

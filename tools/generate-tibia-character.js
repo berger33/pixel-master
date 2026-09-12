@@ -40,18 +40,17 @@ function hex2rgb(h) {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
-// aplica overrides de cor na paleta padrão (gera o tom escuro automaticamente)
+// aplica overrides de cor na paleta padrão (base por material)
 function applyColors(overrides) {
   const pal = {};
   const base = Tibia.DEFAULT_PALETTE;
   for (const k in base) pal[k] = base[k].slice();
-  const dark = function (rgb) { return rgb.map(function (c) { return Math.round(c * 0.65); }); };
   const C = Tibia.C;
-  if (overrides.body) { pal[C.BODY] = hex2rgb(overrides.body); pal[C.BODY_DARK] = dark(pal[C.BODY]); }
-  if (overrides.legs) { pal[C.LEGS] = hex2rgb(overrides.legs); pal[C.LEGS_DARK] = dark(pal[C.LEGS]); }
-  if (overrides.hair) { pal[C.HAIR] = hex2rgb(overrides.hair); }
-  if (overrides.skin) { pal[C.SKIN] = hex2rgb(overrides.skin); }
-  if (overrides.feet) { pal[C.FEET] = hex2rgb(overrides.feet); pal[C.FEET_DARK] = dark(pal[C.FEET]); }
+  if (overrides.body) pal[C.BODY] = hex2rgb(overrides.body);
+  if (overrides.legs) pal[C.LEGS] = hex2rgb(overrides.legs);
+  if (overrides.hair) pal[C.HAIR] = hex2rgb(overrides.hair);
+  if (overrides.skin) pal[C.SKIN] = hex2rgb(overrides.skin);
+  if (overrides.feet) pal[C.FEET] = hex2rgb(overrides.feet);
   return pal;
 }
 
@@ -79,12 +78,31 @@ function tilePath(scale) {
 // ASCII (depuração / validação visual)
 // ---------------------------------------------------------------------------
 function asciiDump(direction, frame) {
-  const idx = Tibia.renderIndexes(direction, frame, 32, 32);
-  const chars = { "-1": " ", "0": "#", "1": "s", "2": "h", "3": "B", "4": "B", "5": "L", "6": "L", "7": "F", "8": "F" };
+  const { mat, light } = Tibia.renderMaterialLight(direction, frame, 32, 32);
+  const MAT_CHAR = { [Tibia.C.SKIN]: "s", [Tibia.C.HAIR]: "h", [Tibia.C.BODY]: "B", [Tibia.C.LEGS]: "L", [Tibia.C.FEET]: "F" };
+  const BAYER = [[0, 2], [3, 1]];
+  function shade(L, x, y) {
+    const scaled = (1 - L) * 3;
+    const base = Math.floor(scaled), frac = scaled - base;
+    const thr = BAYER[y & 1][x & 1] / 4;
+    let s = frac > thr ? base + 1 : base;
+    return Math.max(0, Math.min(3, s));
+  }
   const lines = [];
   for (let y = 0; y < 32; y++) {
     let line = "";
-    for (let x = 0; x < 32; x++) line += chars[String(idx[y * 32 + x])] || "?";
+    for (let x = 0; x < 32; x++) {
+      const m = mat[y * 32 + x];
+      if (m < 0) { line += " "; continue; }
+      if (m >= 200) { line += "o"; continue; } // olho/boca
+      const edge = (x === 0 || mat[y * 32 + (x - 1)] < 0) || (x === 31 || mat[y * 32 + (x + 1)] < 0) ||
+        (y === 0 || mat[(y - 1) * 32 + x] < 0) || (y === 31 || mat[(y + 1) * 32 + x] < 0);
+      if (edge) { line += "█"; continue; }
+      const s = shade(light[y * 32 + x], x, y);
+      const base = MAT_CHAR[m] || "?";
+      // tom: claro = minúscula (ex.: "b"), escuro = maiúscula ("B"), mostrando a rampa
+      line += s <= 1 ? base : base.toUpperCase();
+    }
     lines.push(line);
   }
   return lines.join("\n");
@@ -126,15 +144,13 @@ const hex = function (rgb) {
 };
 const PAL = applyColors(args.colors);
 manifest.palette = {
-  outline: hex(PAL[Tibia.C.OUTLINE]),
-  head: hex(PAL[Tibia.C.SKIN]),
+  outline: hex(Tibia.OUTLINE_DARK),
+  outlineLight: hex(Tibia.OUTLINE_LIGHT),
+  skin: hex(PAL[Tibia.C.SKIN]),
   hair: hex(PAL[Tibia.C.HAIR]),
   body: hex(PAL[Tibia.C.BODY]),
-  bodyDark: hex(PAL[Tibia.C.BODY_DARK]),
   legs: hex(PAL[Tibia.C.LEGS]),
-  legsDark: hex(PAL[Tibia.C.LEGS_DARK]),
-  feet: hex(PAL[Tibia.C.FEET]),
-  feetDark: hex(PAL[Tibia.C.FEET_DARK])
+  feet: hex(PAL[Tibia.C.FEET])
 };
 
 // monta a grade do overview (4 direções x 4 frames) em 64px
@@ -169,15 +185,11 @@ writePNG(path.join(OUT, "overview.png"), ow, oh, overview);
 
 // variante recolorida (demonstra o sistema de tint) — outfit azul/verde
 const RECOLOR = {
-  [Tibia.C.OUTLINE]: [26, 22, 22],
   [Tibia.C.SKIN]: [242, 200, 154],
   [Tibia.C.HAIR]: [40, 30, 60],
   [Tibia.C.BODY]: [40, 120, 200],
-  [Tibia.C.BODY_DARK]: [26, 84, 150],
   [Tibia.C.LEGS]: [40, 140, 90],
-  [Tibia.C.LEGS_DARK]: [26, 100, 62],
-  [Tibia.C.FEET]: [70, 60, 40],
-  [Tibia.C.FEET_DARK]: [46, 40, 26]
+  [Tibia.C.FEET]: [70, 60, 40]
 };
 // usa a máscara + tint para provar recolorização sem redesenhar
 {
