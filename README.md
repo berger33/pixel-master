@@ -47,4 +47,4 @@ python3 -m http.server 8000
 | `95ef115` | feat: núcleo do editor (estado, undo/redo, ferramentas de desenho, paleta) |
 | `67b2442` | feat: animações/frames, atributos, templates prontos e preview |
 | `93f4182` | feat: exportação (PNG/sheet/JSON), persistência local e orquestração |
-| *(último)* | docs: painel de commits no README |
+| `bea6f3c` | docs: painel de commits no README |
