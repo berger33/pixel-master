@@ -1,0 +1,34 @@
+# Sobe o Pixel Master completo (API + editor web).
+#   docker compose up --build
+#   editor:  http://localhost:5173
+#   api:     http://localhost:8000/docs
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      PIXELMASTER_DATABASE_URL: sqlite:////srv/pixelmaster/var/pixelmaster.db
+    volumes:
+      - pm-var:/srv/pixelmaster/var
+    restart: unless-stopped
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    environment:
+      # o Vite proxy já aponta para o backend pelo nome do serviço
+      BACKEND_URL: http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - pm-node:/app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pm-var:
+  pm-node:
