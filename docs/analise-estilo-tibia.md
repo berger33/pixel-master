@@ -8,7 +8,12 @@
 
 ## 0. Status da investigação dos "outfits no GitHub"
 
-Procurei os outfits do Tibia nos seus repositórios e **não os encontrei**:
+> **Atualização:** os outfits acabaram sendo anexados na conversa (GIFs de preview 64×64 da
+> TibiaWiki) e eu os **estudei medindo os sprites reais** (pacote `outfits.zip` do `tibia-outfitter`).
+> Veja o documento **[`analise-outfits-reais.md`](analise-outfits-reais.md)** com as medições
+> concretas (dimensões, direções, ciclo de caminhada, máscara de cor por partes, contorno).
+
+Procurando inicialmente nos seus repositórios GitHub, **não os encontrei** lá:
 
 - Repositórios públicos de `berger33` (8): nenhum contém sprites/outfits do Tibia
   (`pixel-master`, `chs-recruta`, `berger33-chs-recruta`, `aurora-document-rag`,
