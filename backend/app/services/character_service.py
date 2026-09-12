@@ -8,10 +8,13 @@ garantindo que um personagem salvo seja sempre regenerável.
 
 from __future__ import annotations
 
+import io
 import re
 import unicodedata
 import uuid
 from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import UTC
 from pathlib import Path
 
 from app.animation.animator import AnimationParams, build_clips
@@ -37,7 +40,18 @@ from app.generator.rig import Rig, compose_rig
 from app.pixel.canvas import PixelCanvas
 from app.pixel.spritesheet import AnimationClip, SpriteSheet, pack_animation_set
 
-__all__ = ["CharacterService", "slugify"]
+__all__ = ["CharacterService", "BatchResult", "slugify"]
+
+
+@dataclass
+class BatchResult:
+    """Resultado de uma exportação em lote."""
+
+    filename: str
+    size_bytes: int
+    download_url: str
+    character_count: int
+    files: list[str]
 
 _ALL_DIRECTIONS = [Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.UP]
 
@@ -283,6 +297,140 @@ class CharacterService:
             zip_size=len(zip_bytes),
         )
         return bundle, zip_bytes, zip_path
+
+    # ------------------------------------------------------------------
+    # Exportação em lote (bestiário completo)
+    # ------------------------------------------------------------------
+    def export_batch(
+        self,
+        asset_ids: list[str] | None = None,
+        options: ExportOptions | None = None,
+    ) -> BatchResult:
+        """Empacota vários personagens num único .zip de bestiário.
+
+        Layout::
+
+            bestiary.json                 índice do lote (stats + caminhos)
+            contact_sheet.png             grade visual (pose frontal de todos)
+            <slug>__<id8>/spritesheet.png pacote individual completo
+            <slug>__<id8>/manifest.json
+            <slug>__<id8>/card.json ...
+
+        ``asset_ids=None`` exporta **todos** os personagens salvos.
+        """
+        import json as _json
+        import math
+        import zipfile as _zipfile
+        from datetime import datetime
+
+        options = options or ExportOptions()
+        if asset_ids is None:
+            assets = self.repo.list_all()
+        else:
+            assets = []
+            for aid in asset_ids:
+                asset = self.repo.get(aid)
+                if asset is None:
+                    raise KeyError(aid)
+                assets.append(asset)
+        if not assets:
+            raise ValueError("nenhum personagem para exportar")
+
+        files: dict[str, bytes] = {}
+        entries: list[dict] = []
+        poses: list[PixelCanvas] = []
+        cell_w = max(a.frame_width for a in assets)
+        cell_h = max(a.frame_height for a in assets)
+
+        for asset in assets:
+            artifacts = build_artifacts(asset, self.clips(asset), options)
+            dir_name = f"{asset.slug or asset.id}__{asset.id[:8]}"
+            for name, blob in artifacts.files.items():
+                files[f"{dir_name}/{name}"] = blob
+
+            sheet = pack_animation_set(
+                self.clips(asset), frame_width=asset.frame_width, frame_height=asset.frame_height
+            )
+            poses.append(compose_rig(self.rig_factory(asset)(Direction.DOWN)))
+            entries.append(
+                {
+                    "id": asset.id,
+                    "slug": asset.slug,
+                    "name": asset.name,
+                    "kind": asset.kind,
+                    "species": asset.species,
+                    "rarity": asset.rarity.value,
+                    "origin": asset.origin.value,
+                    "seed": asset.seed,
+                    "dir": f"{dir_name}/",
+                    "sprite": {
+                        "atlas": f"{dir_name}/spritesheet.png",
+                        "manifest": f"{dir_name}/manifest.json",
+                        "card": f"{dir_name}/card.json",
+                        "frameWidth": sheet.frame_width,
+                        "frameHeight": sheet.frame_height,
+                        "columns": sheet.columns,
+                        "rows": sheet.rows,
+                        "frameCount": sheet.frame_count,
+                        "anchor": {"x": asset.anchor[0], "y": asset.anchor[1]},
+                    },
+                    "animations": {
+                        name: {"fps": payload["fps"], "loops": payload["loops"],
+                               "directions": sorted(payload["directions"])}
+                        for name, payload in sheet.animations.items()
+                    },
+                    "stats": asset.stats.model_dump(),
+                    "powerRating": asset.stats.power_rating(),
+                    "abilities": [a.model_dump() for a in asset.abilities],
+                }
+            )
+
+        # contact sheet: grade visual com a pose frontal de cada personagem
+        cols = 8
+        rows = max(1, math.ceil(len(poses) / cols))
+        contact = PixelCanvas(cols * cell_w, rows * cell_h)
+        for i, pose in enumerate(poses):
+            contact.blit(pose, (i % cols) * cell_w, (i // cols) * cell_h)
+        files["contact_sheet.png"] = self._scaled_png(contact, 2)
+
+        files["bestiary.json"] = _json.dumps(
+            {
+                "format": "vandoria/bestiary",
+                "version": 1,
+                "generatedAt": datetime.now(UTC).isoformat(),
+                "count": len(entries),
+                "frameWidth": cell_w,
+                "frameHeight": cell_h,
+                "contactSheet": {
+                    "image": "contact_sheet.png",
+                    "columns": cols,
+                    "rows": rows,
+                    "order": [e["dir"] for e in entries],
+                },
+                "characters": entries,
+            },
+            indent=2,
+            ensure_ascii=False,
+        ).encode()
+
+        buf = io.BytesIO()
+        with _zipfile.ZipFile(buf, "w", _zipfile.ZIP_DEFLATED) as zf:
+            for name in sorted(files):
+                zf.writestr(name, files[name])
+        zip_bytes = buf.getvalue()
+
+        self.settings.storage_dir.mkdir(parents=True, exist_ok=True)
+        stamp = uuid.uuid4().hex[:8]
+        zip_path = self.settings.storage_dir / f"bestiary_{stamp}.zip"
+        zip_path.write_bytes(zip_bytes)
+
+        return BatchResult(
+            filename=f"vandoria_bestiary_{stamp}.zip",
+            size_bytes=len(zip_bytes),
+            download_url=f"/api/exports/{zip_path.name}",
+            character_count=len(entries),
+            files=sorted(files),
+        )
 
     # ------------------------------------------------------------------
     # CRUD

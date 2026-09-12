@@ -172,6 +172,14 @@ export interface AnimationSpec {
   frames_per_direction: Record<string, number>;
 }
 
+export interface BatchExportResult {
+  filename: string;
+  size_bytes: number;
+  download_url: string;
+  character_count: number;
+  files: string[];
+}
+
 export interface ExportBundle {
   asset_id: string;
   filename: string;

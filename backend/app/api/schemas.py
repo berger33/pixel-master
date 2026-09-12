@@ -6,11 +6,34 @@ from pydantic import BaseModel, Field
 
 from app.domain.models import (
     CharacterAsset,
+    ExportOptions,
     ProceduralBlueprint,
     Rarity,
 )
 
-__all__ = ["GenerateRequest", "GenerateResponse", "MetaResponse", "MessageResponse"]
+__all__ = [
+    "GenerateRequest",
+    "GenerateResponse",
+    "MetaResponse",
+    "MessageResponse",
+    "BatchExportRequest",
+    "BatchExportResult",
+]
+
+
+class BatchExportRequest(BaseModel):
+    """``ids=None`` exporta todos os personagens salvos."""
+
+    ids: list[str] | None = None
+    options: ExportOptions | None = None
+
+
+class BatchExportResult(BaseModel):
+    filename: str
+    size_bytes: int
+    download_url: str
+    character_count: int
+    files: list[str]
 
 
 class GenerateRequest(BaseModel):

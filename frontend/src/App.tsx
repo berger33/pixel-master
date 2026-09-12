@@ -6,6 +6,7 @@ import SidePanel from './components/SidePanel';
 import SpritePreview from './components/SpritePreview';
 import type {
   AnimationName,
+  BatchExportResult,
   CharacterAsset,
   Direction,
   ExportBundle,
@@ -35,6 +36,8 @@ export default function App() {
 
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportingBatch, setExportingBatch] = useState(false);
+  const [batch, setBatch] = useState<BatchExportResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const refreshLibrary = useCallback(async () => {
@@ -154,6 +157,25 @@ export default function App() {
     [asset],
   );
 
+  const onExportBatch = useCallback(async (options: ExportOptions) => {
+    setExportingBatch(true);
+    setError(null);
+    try {
+      const b = await api.exportBatch({ ids: null, options });
+      setBatch(b);
+      const a = document.createElement('a');
+      a.href = b.download_url;
+      a.download = b.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setExportingBatch(false);
+    }
+  }, []);
+
   const availableAnims = manifest ? ANIMATIONS.filter((a) => manifest.animations[a]) : ANIMATIONS;
   const availableDirs =
     manifest && animation ? DIRECTIONS.filter((d) => manifest.animations[animation]?.directions[d]) : DIRECTIONS;
@@ -230,8 +252,11 @@ export default function App() {
           asset={asset}
           library={library}
           bundle={bundle}
+          batch={batch}
           exporting={exporting}
+          exportingBatch={exportingBatch}
           onExport={onExport}
+          onExportBatch={onExportBatch}
           onLoad={onLoad}
           onDelete={onDelete}
         />

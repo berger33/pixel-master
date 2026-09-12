@@ -9,7 +9,14 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Upload
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 
-from app.api.schemas import GenerateRequest, GenerateResponse, MetaResponse, PreviewUrls
+from app.api.schemas import (
+    BatchExportRequest,
+    BatchExportResult,
+    GenerateRequest,
+    GenerateResponse,
+    MetaResponse,
+    PreviewUrls,
+)
 from app.core.config import Settings, get_settings
 from app.domain.abilities import ABILITIES
 from app.domain.models import (
@@ -274,6 +281,17 @@ def export_character(
     asset = _require(service, asset_id)
     bundle, _zip, _path = service.export(asset, options or ExportOptions())
     return bundle
+
+
+@router.post("/api/characters/export-batch", response_model=BatchExportResult, tags=["export"])
+def export_batch(body: BatchExportRequest, service: ServiceDep) -> BatchExportResult:
+    """Exporta o bestiário completo (ou um subconjunto) em um único .zip."""
+    try:
+        return service.export_batch(body.ids, body.options)
+    except KeyError as exc:
+        raise HTTPException(404, f"personagem não encontrado: {exc.args[0]}") from exc
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
 
 
 @router.get("/api/exports/{filename}", tags=["export"])

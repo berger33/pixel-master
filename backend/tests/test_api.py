@@ -179,3 +179,58 @@ def test_import_rejects_bad_params(client, fixture_image_bytes):
         data={"name": "x", "params": "{\"target_size\": 9999}"},
     )
     assert res.status_code == 422
+
+
+def _generate(client, name, seed, species="human"):
+    res = client.post(
+        "/api/characters/generate",
+        json={
+            "name": name,
+            "seed": seed,
+            "blueprint": {"seed": seed, "species": species, "outfit": "adventurer"},
+        },
+    )
+    assert res.status_code == 200, res.text
+    return res.json()["asset"]
+
+
+def test_export_batch_all_characters(client, procedural_asset):
+    second = _generate(client, "Lobo do Norte", 88, species="wolf")
+    third = _generate(client, "Slime do Pântano", 89, species="slime")
+
+    res = client.post("/api/characters/export-batch", json={})
+    assert res.status_code == 200, res.text
+    bundle = res.json()
+    assert bundle["character_count"] >= 3
+    assert bundle["filename"].startswith("vandoria_bestiary_")
+
+    dl = client.get(bundle["download_url"])
+    assert dl.status_code == 200
+    zf = zipfile.ZipFile(io.BytesIO(dl.content))
+    names = set(zf.namelist())
+    assert "bestiary.json" in names
+    assert "contact_sheet.png" in names
+
+    bestiary = json.loads(zf.read("bestiary.json"))
+    assert bestiary["format"] == "vandoria/bestiary"
+    assert bestiary["count"] == bundle["character_count"]
+    ids = {e["id"] for e in bestiary["characters"]}
+    assert {procedural_asset["id"], second["id"], third["id"]} <= ids
+    for entry in bestiary["characters"]:
+        assert f"{entry['dir']}spritesheet.png" in names, entry["dir"]
+        assert f"{entry['dir']}manifest.json" in names
+        assert f"{entry['dir']}card.json" in names
+        assert entry["stats"]["health"] > 0
+    # a contact sheet tem uma linha a cada 8 personagens
+    assert bestiary["contactSheet"]["columns"] == 8
+
+
+def test_export_batch_subset(client, procedural_asset):
+    res = client.post("/api/characters/export-batch", json={"ids": [procedural_asset["id"]]})
+    assert res.status_code == 200
+    assert res.json()["character_count"] == 1
+
+
+def test_export_batch_errors(client):
+    assert client.post("/api/characters/export-batch", json={"ids": ["nao-existe"]}).status_code == 404
+    assert client.post("/api/characters/export-batch", json={"ids": []}).status_code == 404

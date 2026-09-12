@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { thumbUrl } from '../api';
-import type { CharacterAsset, ExportBundle, ExportOptions } from '../types';
+import type { BatchExportResult, CharacterAsset, ExportBundle, ExportOptions } from '../types';
 
 interface Props {
   asset: CharacterAsset | null;
   library: CharacterAsset[];
   bundle: ExportBundle | null;
+  batch: BatchExportResult | null;
   exporting: boolean;
+  exportingBatch: boolean;
   onExport: (options: ExportOptions) => void;
+  onExportBatch: (options: ExportOptions) => void;
   onLoad: (id: string) => void;
   onDelete: (id: string) => void;
 }
@@ -19,7 +22,18 @@ const FORMATS: { id: string; label: string }[] = [
   { id: 'aseprite_sheet', label: 'Aseprite (tags)' },
 ];
 
-export default function SidePanel({ asset, library, bundle, exporting, onExport, onLoad, onDelete }: Props) {
+export default function SidePanel({
+  asset,
+  library,
+  bundle,
+  batch,
+  exporting,
+  exportingBatch,
+  onExport,
+  onExportBatch,
+  onLoad,
+  onDelete,
+}: Props) {
   const [formats, setFormats] = useState<string[]>(['phaser_hash', 'uniform_grid']);
   const [scale, setScale] = useState(1);
   const [gif, setGif] = useState(true);
@@ -147,6 +161,40 @@ export default function SidePanel({ asset, library, bundle, exporting, onExport,
       {/* -------------------------------------------------------- biblioteca */}
       <section className="panel">
         <h2>🗄️ Biblioteca ({library.length})</h2>
+        <button
+          className="primary"
+          style={{ width: '100%', marginBottom: 10 }}
+          disabled={library.length === 0 || exportingBatch}
+          onClick={() =>
+            onExportBatch({
+              formats,
+              include_sparrow_xml: false,
+              include_gif_preview: gif,
+              include_individual_frames: false,
+              include_manifest: true,
+              include_stats: card,
+              include_vandoria_card: card,
+              scale: 1,
+              transparent_background: true,
+            })
+          }
+        >
+          {exportingBatch ? 'Empacotando bestiário…' : `📚 Exportar bestiário completo (${library.length})`}
+        </button>
+        {batch && (
+          <div className="info-card">
+            <div>
+              <b>{batch.filename}</b> · {(batch.size_bytes / 1024).toFixed(1)} KB
+            </div>
+            <div className="muted">
+              {batch.character_count} personagens · {batch.files.length} arquivos · inclui bestiary.json +
+              contact_sheet.png
+            </div>
+            <a className="linklike" href={batch.download_url} download={batch.filename}>
+              baixar novamente ↗
+            </a>
+          </div>
+        )}
         {library.length === 0 ? (
           <p className="hint">Nenhum personagem salvo ainda.</p>
         ) : (

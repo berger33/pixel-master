@@ -1,4 +1,5 @@
 import type {
+  BatchExportResult,
   CharacterAsset,
   ExportBundle,
   ExportOptions,
@@ -45,6 +46,13 @@ export const api = {
   remove: (id: string) => json<{ deleted: boolean }>(`/api/characters/${id}`, { method: 'DELETE' }),
 
   manifest: (id: string) => json<Manifest>(`/api/characters/${id}/manifest.json`),
+
+  exportBatch: (payload: { ids: string[] | null; options: ExportOptions }) =>
+    json<BatchExportResult>('/api/characters/export-batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
 
   export: (id: string, options: ExportOptions) =>
     json<ExportBundle>(`/api/characters/${id}/export`, {
