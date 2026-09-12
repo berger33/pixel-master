@@ -1,0 +1,205 @@
+{
+  "format": "pixel-master/tibia/v1",
+  "name": "Mage",
+  "kind": "character",
+  "style": "tibia-oblique",
+  "gridSize": 32,
+  "directions": [
+    "north",
+    "east",
+    "south",
+    "west"
+  ],
+  "framesPerDirection": 4,
+  "palette": {
+    "outline": "#1a1616",
+    "head": "#f2c89a",
+    "hair": "#3a2a50",
+    "body": "#2a6ad0",
+    "bodyDark": "#1b4587",
+    "legs": "#c8a02a",
+    "legsDark": "#82681b",
+    "feet": "#4a3220",
+    "feetDark": "#302115"
+  },
+  "sprites": [
+    {
+      "direction": "norte",
+      "frame": 1,
+      "file": "32/1_1_1_1.png",
+      "file64": "64/1_1_1_1.png"
+    },
+    {
+      "direction": "norte",
+      "frame": 2,
+      "file": "32/1_1_1_2.png",
+      "file64": "64/1_1_1_2.png"
+    },
+    {
+      "direction": "norte",
+      "frame": 3,
+      "file": "32/1_1_1_3.png",
+      "file64": "64/1_1_1_3.png"
+    },
+    {
+      "direction": "norte",
+      "frame": 4,
+      "file": "32/1_1_1_4.png",
+      "file64": "64/1_1_1_4.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 1,
+      "file": "32/2_1_1_1.png",
+      "file64": "64/2_1_1_1.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 2,
+      "file": "32/2_1_1_2.png",
+      "file64": "64/2_1_1_2.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 3,
+      "file": "32/2_1_1_3.png",
+      "file64": "64/2_1_1_3.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 4,
+      "file": "32/2_1_1_4.png",
+      "file64": "64/2_1_1_4.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 1,
+      "file": "32/3_1_1_1.png",
+      "file64": "64/3_1_1_1.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 2,
+      "file": "32/3_1_1_2.png",
+      "file64": "64/3_1_1_2.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 3,
+      "file": "32/3_1_1_3.png",
+      "file64": "64/3_1_1_3.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 4,
+      "file": "32/3_1_1_4.png",
+      "file64": "64/3_1_1_4.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 1,
+      "file": "32/4_1_1_1.png",
+      "file64": "64/4_1_1_1.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 2,
+      "file": "32/4_1_1_2.png",
+      "file64": "64/4_1_1_2.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 3,
+      "file": "32/4_1_1_3.png",
+      "file64": "64/4_1_1_3.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 4,
+      "file": "32/4_1_1_4.png",
+      "file64": "64/4_1_1_4.png"
+    }
+  ],
+  "masks": [
+    {
+      "direction": "norte",
+      "frame": 1,
+      "file": "mask/32/1_1_1_1.png"
+    },
+    {
+      "direction": "norte",
+      "frame": 2,
+      "file": "mask/32/1_1_1_2.png"
+    },
+    {
+      "direction": "norte",
+      "frame": 3,
+      "file": "mask/32/1_1_1_3.png"
+    },
+    {
+      "direction": "norte",
+      "frame": 4,
+      "file": "mask/32/1_1_1_4.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 1,
+      "file": "mask/32/2_1_1_1.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 2,
+      "file": "mask/32/2_1_1_2.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 3,
+      "file": "mask/32/2_1_1_3.png"
+    },
+    {
+      "direction": "leste",
+      "frame": 4,
+      "file": "mask/32/2_1_1_4.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 1,
+      "file": "mask/32/3_1_1_1.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 2,
+      "file": "mask/32/3_1_1_2.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 3,
+      "file": "mask/32/3_1_1_3.png"
+    },
+    {
+      "direction": "sul",
+      "frame": 4,
+      "file": "mask/32/3_1_1_4.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 1,
+      "file": "mask/32/4_1_1_1.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 2,
+      "file": "mask/32/4_1_1_2.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 3,
+      "file": "mask/32/4_1_1_3.png"
+    },
+    {
+      "direction": "oeste",
+      "frame": 4,
+      "file": "mask/32/4_1_1_4.png"
+    }
+  ]
+}
