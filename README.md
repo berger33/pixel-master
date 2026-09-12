@@ -78,3 +78,4 @@ node tools/generate-examples.js
 | `cd8c6c7` | assets: sprites PNG e JSON de exemplo para os 9 modelos |
 | `2f38c9d` | docs: atualiza painel de commits e documenta exemplos |
 | `a9dcaf8` | docs: análise comparativa do estilo Tibia vs Pixel Master |
+| `bdf1225` | docs: análise empírica dos outfits reais do Tibia (dimensões, direções, ciclo de caminhada, tint por partes) |
